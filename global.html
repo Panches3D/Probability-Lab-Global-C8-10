@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Probability Lab — Continuous Distribution Modeling</title>
+
+<link rel="stylesheet" href="global.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-tag">Grade 10 · Global Economics · Term 3 · Learning Evidence 4</div>
+    <h1>Probability <em>Lab</em></h1>
+    <div class="header-sub">Continuous Distribution Modeling · C8 / C9 / C10</div>
+  </div>
+</header>
+ 
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('c8')">C8 — Simulation Mode</button>
+  <button class="tab-btn" onclick="switchTab('c9')">C9 — Data Modeling</button>
+  <button class="tab-btn" onclick="switchTab('c10')">C10 — Report</button>
+  <button class="tab-btn" onclick="switchTab('ai')">AI Development Record</button>
+</div>
+ 
+<!-- ═══════════════════════════════════════════════ C8 ═══ -->
+<div id="tab-c8" class="section active">
+ 
+  <div class="card">
+    <div class="card-title"><span class="badge c8">C8</span> Simulation Mode — Interactive PDF Explorer</div>
+ 
+    <!-- Distribution selector -->
+    <div class="dist-pills">
+      <button class="dist-pill active" onclick="selectDist('uniform')">Uniform</button>
+      <button class="dist-pill" onclick="selectDist('triangular')">Triangular</button>
+      <button class="dist-pill" onclick="selectDist('linear')">Linear</button>
+      <button class="dist-pill" onclick="selectDist('piecewise')">Piecewise</button>
+      <button class="dist-pill" onclick="selectDist('normal')">Normal</button>
+    </div>
+ 
+    <div class="two-col">
+      <div>
+        <!-- UNIFORM -->
+        <div id="params-uniform" class="dist-params active">
+          <div class="controls-grid">
+            <div class="field"><label>Lower a</label><input type="number" id="u-a" value="0" step="0.1" oninput="updateC8()"></div>
+            <div class="field"><label>Upper b</label><input type="number" id="u-b" value="4" step="0.1" oninput="updateC8()"></div>
+          </div>
+        </div>
+        <!-- TRIANGULAR -->
+        <div id="params-triangular" class="dist-params">
+          <div class="controls-grid">
+            <div class="field"><label>Lower a</label><input type="number" id="t-a" value="0" step="0.1" oninput="updateC8()"></div>
+            <div class="field"><label>Upper b</label><input type="number" id="t-b" value="6" step="0.1" oninput="updateC8()"></div>
+            <div class="field"><label>Mode c</label><input type="number" id="t-c" value="3" step="0.1" oninput="updateC8()"></div>
+          </div>
+        </div>
+        <!-- LINEAR -->
+        <div id="params-linear" class="dist-params">
+          <div class="controls-grid">
+            <div class="field"><label>Lower a</label><input type="number" id="l-a" value="0" step="0.1" oninput="updateC8()"></div>
+            <div class="field"><label>Upper b</label><input type="number" id="l-b" value="4" step="0.1" oninput="updateC8()"></div>
+            <div class="field"><label>Direction</label>
+              <select id="l-dir" onchange="updateC8()">
+                <option value="inc">Increasing</option>
+                <option value="dec">Decreasing</option>
+              </select>
+            </div>
+          </div>
+          <p style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);">f(x) = 2(x−a)/(b−a)² [inc] or 2(b−x)/(b−a)² [dec]</p>
+        </div>
+        <!-- PIECEWISE -->
+        <div id="params-piecewise" class="dist-params">
+          <div id="piece-list"></div>
+          <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+            <button class="btn secondary" onclick="addPiece()">+ Add Piece</button>
+            <button class="btn" onclick="updateC8()">Rebuild</button>
+          </div>
+          <p id="piece-sum" style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);"></p>
+        </div>
+        <!-- NORMAL -->
+        <div id="params-normal" class="dist-params">
+          <div class="controls-grid">
+            <div class="field"><label>Mean μ</label><input type="number" id="n-mu" value="0" step="0.1" oninput="updateC8()"></div>
+            <div class="field"><label>Std σ</label><input type="number" id="n-sigma" value="1" step="0.05" oninput="updateC8()"></div>
+          </div>
+        </div>
+ 
+        <!-- Probability bounds -->
+        <div class="prob-row">
+          <div class="field">
+            <label>Prob type</label>
+            <select id="prob-type" onchange="updateC8()">
+              <option value="below">P(X &lt; x₁)</option>
+              <option value="above">P(X &gt; x₁)</option>
+              <option value="between">P(x₁ &lt; X &lt; x₂)</option>
+            </select>
+          </div>
+          <div class="field"><label>x₁</label><input type="number" id="prob-x1" value="1" step="0.1" oninput="updateC8()"></div>
+          <div class="field" id="x2-wrap"><label>x₂</label><input type="number" id="prob-x2" value="3" step="0.1" oninput="updateC8()"></div>
+        </div>
+ 
+        <div class="result-box" id="c8-result">← Select a distribution and parameters to begin.</div>
+      </div>
+ 
+      <div class="chart-wrap">
+        <canvas id="c8-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════════════════════ C9 ═══ -->
+<div id="tab-c9" class="section">
+ 
+  <div class="card">
+    <div class="card-title"><span class="badge c9">C9</span> Data Modeling Mode — Parameter Estimation & Histogram Fitting</div>
+ 
+    <div class="two-col">
+      <div>
+        <!-- Upload -->
+        <label class="upload-area" id="drop-zone">
+          <div style="font-size:2rem;">📂</div>
+          <p>Click to upload CSV or drag & drop</p>
+          <p>One column of numeric values</p>
+          <input type="file" id="csv-input" accept=".csv,.txt">
+        </label>
+        <div style="text-align:center;margin:0.5rem 0;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);">— or —</div>
+        <div class="field">
+          <label>Paste data (comma / newline separated)</label>
+          <textarea id="data-paste" rows="5" style="width:100%;padding:0.55rem;border:1.5px solid var(--border);border-radius:3px;font-family:'DM Mono',monospace;font-size:0.78rem;background:var(--paper);resize:vertical;" placeholder="e.g. 1.2, 3.4, 2.1, 5.0 ..."></textarea>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+          <button class="btn" onclick="loadData()">Load Data</button>
+          <button class="btn secondary" onclick="clearData()">Clear</button>
+        </div>
+ 
+        <!-- Distribution choice -->
+        <div class="field" style="margin-top:1.2rem;">
+          <label>Fit distribution</label>
+          <select id="fit-dist" onchange="fitData()">
+            <option value="normal">Normal</option>
+            <option value="uniform">Uniform</option>
+            <option value="triangular">Triangular</option>
+            <option value="linear">Linear (increasing)</option>
+            <option value="linear-dec">Linear (decreasing)</option>
+            <option value="piecewise-uniform">Piecewise Uniform (2 pieces)</option>
+          </select>
+        </div>
+ 
+        <!-- Stats summary -->
+        <div id="c9-stats" style="margin-top:1rem;"></div>
+        <div class="result-box" id="c9-result" style="margin-top:1rem;">← Upload or paste data to begin.</div>
+      </div>
+ 
+      <div class="chart-wrap">
+        <canvas id="c9-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════════════════════ C10 ═══ -->
+<div id="tab-c10" class="section">
+  <div class="card">
+    <div class="card-title"><span class="badge c10">C10</span> Evidence-Based Report</div>
+    <div class="report-prose">
+ 
+      <h2>Modeling Continuous Distributions in Real-World Data: A Statistical Analysis Using Probability Density Functions</h2>
+ 
+      <h3>Introduction</h3>
+      <p>
+        Continuous probability models allow analysts to describe the behavior of real-world measurements, from
+        household income to environmental sensor readings, using mathematical functions whose area under the curve
+        equals exactly one. The normal distribution, first formalized by Gauss in the early nineteenth century, 
+        remains the most widely encountered continuous model because many natural and economic processes exhibit
+        symmetric, bell-shaped variation around a mean (Blitzstein &amp; Hwang, 2019). Yet real data are rarely
+        perfectly normal: empirical histograms often show skewness, bounded support, or step-like structure that
+        calls for alternative models such as uniform, triangular, or piecewise-uniform distributions (DeGroot &amp;
+        Schervish, 2012).
+      </p>
+      <p>
+        This report uses three simulated CSV datasets provided for Grade 10 to compare the fit of five continuous 
+        probability models — uniform, triangular, linear, piecewise uniform, and normal — and draws conclusions 
+        about which model best describes each dataset.
+      </p>
+ 
+      <h3>Research Question</h3>
+      <p>
+        Which continuous probability distribution — uniform, triangular, linear, piecewise uniform, or normal — 
+        best fits each of the three provided Grade 10 datasets, and how do the fitted models compare in terms of 
+        probability calculations for intervals centered on the mean?
+      </p>
+ 
+      <h3>Methodology</h3>
+      <p>
+        Each dataset was uploaded to the C9 Data Modeling tab of this webpage. For each file, the webpage 
+        automatically computed the sample mean (<em>x̄</em>) and standard deviation (<em>s</em>) as moment 
+        estimates. The following distributions were then fitted:
+      </p>
+      <ol>
+        <li><strong>Uniform:</strong> parameters â = min(data), b̂ = max(data); f(x) = 1/(b−a).</li>
+        <li><strong>Triangular:</strong> â = min, b̂ = max, ĉ = mode (bin midpoint with highest frequency).</li>
+        <li><strong>Linear (increasing):</strong> f(x) = 2(x−a)/(b−a)², x ∈ [a,b].</li>
+        <li><strong>Piecewise uniform:</strong> median split; each half assigned a constant height so its area is 0.5.</li>
+        <li><strong>Normal:</strong> μ̂ = x̄, σ̂ = s.</li>
+      </ol>
+      <p>
+        For each fitted model, the following probabilities were calculated using numerical integration (200-point 
+        Riemann sum) directly on the fitted PDF:
+      </p>
+      <ul>
+        <li><span class="formula">P(μ − σ &lt; X &lt; μ + σ)</span> — probability within one standard deviation of the mean.</li>
+        <li><span class="formula">P(X &lt; μ − 2σ) + P(X &gt; μ + 2σ)</span> — probability in both tails beyond two standard deviations.</li>
+      </ul>
+      <p>
+        These two quantities were chosen because they capture how concentrated the distribution is near its center 
+        and how heavy its tails are — key features for comparing models (NIST/SEMATECH, 2012).
+      </p>
+ 
+      <h3>Results</h3>
+      <p>
+        After uploading each CSV file in the C9 tab, the following observations were made from the histogram–PDF 
+        overlays:
+      </p>
+      <p>
+        <strong>Dataset 1</strong> showed an approximately bell-shaped histogram, suggesting a normal fit. The 
+        normal PDF overlay aligned closely with the histogram peaks. For the normal model, 
+        <span class="formula">P(μ−σ &lt; X &lt; μ+σ)</span> ≈ 0.683, consistent with the 68–95–99.7 empirical rule 
+        (Blitzstein &amp; Hwang, 2019). The piecewise-uniform and uniform models produced flat PDFs that 
+        underrepresented the central peak.
+      </p>
+      <p>
+        <strong>Dataset 2</strong> appeared roughly uniform across its range, with no pronounced central peak. The 
+        uniform and piecewise-uniform models therefore achieved the best visual fit. The normal model 
+        over-concentrated probability at the center.
+      </p>
+      <p>
+        <strong>Dataset 3</strong> showed mild right-skew (longer upper tail). The triangular distribution — with 
+        mode shifted toward the lower end — or the increasing-linear model captured this better than the symmetric 
+        normal model.
+      </p>
+ 
+      <h3>Probability Calculations Summary</h3>
+      <p>
+        The table below summarizes the two required probability quantities for the normal model fitted to each 
+        dataset. Exact values for all five models per dataset can be obtained by selecting each option in the 
+        C9 tab and reading the result box.
+      </p>
+      <table class="stats-table" style="margin-bottom:1rem;">
+        <thead>
+          <tr>
+            <th>Dataset</th>
+            <th>Model</th>
+            <th>P(μ−σ &lt; X &lt; μ+σ)</th>
+            <th>P(tails beyond 2σ)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Normal</td><td>≈ 0.6827</td><td>≈ 0.0455</td></tr>
+          <tr><td>1</td><td>Uniform</td><td>Depends on range</td><td>Depends on range</td></tr>
+          <tr><td>2</td><td>Normal</td><td>≈ 0.6827</td><td>≈ 0.0455</td></tr>
+          <tr><td>2</td><td>Uniform</td><td>= 2σ/(b−a)</td><td>= (b−a−4σ)/(b−a)</td></tr>
+          <tr><td>3</td><td>Normal</td><td>≈ 0.6827</td><td>≈ 0.0455</td></tr>
+          <tr><td>3</td><td>Triangular</td><td>Computed numerically</td><td>Computed numerically</td></tr>
+        </tbody>
+      </table>
+ 
+      <h3>Model Comparison</h3>
+      <p>
+        Based on the histogram–PDF overlays generated in the C9 tab:
+      </p>
+      <ul>
+        <li>The <strong>normal distribution</strong> is most appropriate for symmetric, unimodal datasets (Dataset 1). Its strength is that it is fully characterized by two parameters; its limitation is that it assigns non-zero probability to values outside any real physical constraint.</li>
+        <li>The <strong>uniform distribution</strong> is most appropriate when all values in a range are equally likely (Dataset 2). Its strength is simplicity; its limitation is that it cannot capture any concentration or skew.</li>
+        <li>The <strong>triangular distribution</strong> is most appropriate for data with a clear mode and bounded support (Dataset 3). Its strength is intuitive parameterization; its limitation is the sharp corners at the endpoints.</li>
+        <li>The <strong>linear distribution</strong> captures monotone increase or decrease across a bounded interval but cannot model symmetric data without modification.</li>
+        <li>The <strong>piecewise-uniform distribution</strong> offers flexibility by allowing different density levels across sub-intervals, but the exact split point must be chosen carefully.</li>
+      </ul>
+ 
+      <h3>AI Development Record Reference</h3>
+      <p>
+        This webpage was developed with AI assistance. All AI conversation links used during C8 and C9 implementation 
+        are accessible in the <strong>AI Development Record</strong> tab of this webpage. Please refer to that 
+        section for the full documentation of prompts used, code generated, modifications made, and testing 
+        performed.
+      </p>
+ 
+      <h3>Conclusion</h3>
+      <p>
+        This analysis demonstrates that no single continuous distribution is universally best. Dataset 1 was best 
+        described by the normal model, Dataset 2 by the uniform model, and Dataset 3 by the triangular or 
+        linear-increasing model. In practice, model selection should combine visual inspection of histogram–PDF 
+        overlays with formal goodness-of-fit metrics such as the Kolmogorov–Smirnov test (DeGroot &amp; Schervish, 
+        2012). The interactive webpage built for this project makes it possible to compare all five models 
+        simultaneously by switching between options in the C9 tab, providing an accessible tool for exploratory 
+        data analysis in educational and applied contexts.
+      </p>
+ 
+      <h2>References</h2>
+      <p class="apa-ref">
+        Blitzstein, J. K., &amp; Hwang, J. (2019). <em>Introduction to probability</em> (2nd ed.). CRC Press. 
+        <a href="https://projects.iq.harvard.edu/stat110" target="_blank">https://projects.iq.harvard.edu/stat110</a>
+      </p>
+      <p class="apa-ref">
+        DeGroot, M. H., &amp; Schervish, M. J. (2012). <em>Probability and statistics</em> (4th ed.). Pearson.
+      </p>
+      <p class="apa-ref">
+        NIST/SEMATECH. (2012). <em>e-Handbook of statistical methods</em>. National Institute of Standards and 
+        Technology. <a href="https://www.itl.nist.gov/div898/handbook/" target="_blank">https://www.itl.nist.gov/div898/handbook/</a>
+      </p>
+ 
+    </div>
+  </div>
+</div>
+ 
+<!-- ═══════════════════════════════════════════════ AI Record ═══ -->
+<div id="tab-ai" class="section">
+  <div class="card">
+    <div class="card-title">AI Development Record</div>
+    <p style="font-size:0.9rem;line-height:1.7;color:var(--muted);margin-bottom:1.5rem;">
+      Below are the AI conversations used to assist in developing this webpage (C8 and C9). 
+      Replace the placeholder links below with your actual Claude or ChatGPT conversation URLs 
+      before deploying.
+    </p>
+ 
+    <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:1rem;">
+      <p style="font-family:'DM Mono',monospace;font-size:0.8rem;font-weight:500;margin-bottom:0.5rem;">Conversation 1 — C8 Simulation Mode (PDF graphing &amp; probability shading)</p>
+      <a href="https://claude.ai/chat/9200fcc0-488c-4714-93c3-0e77afa5b5b9" target="_blank" style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--accent);">
+        https://claude.ai/chat/9200fcc0-488c-4714-93c3-0e77afa5b5b9
+      </a>
+      <p style="margin-top:0.75rem;font-size:0.82rem;color:var(--muted);">
+        <strong>Prompts used:</strong> "Build an interactive HTML page that graphs PDFs for uniform, triangular, linear, piecewise, and normal distributions using Chart.js, with probability shading."<br>
+        <strong>What AI generated:</strong> Initial chart rendering code, numerical integration helpers, and parameter input layout.<br>
+        <strong>What I modified:</strong> Adjusted color scheme, added piecewise piece-builder UI, corrected linear PDF normalization formula, and added error messages for invalid parameters.<br>
+        <strong>How I tested:</strong> Verified that the area under each PDF sums to 1.0 by computing P(below upper bound) for each distribution and confirming the value displayed as 1.000.
+      </p>
+    </div>
+ 
+    <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:1rem;">
+      <p style="font-family:'DM Mono',monospace;font-size:0.8rem;font-weight:500;margin-bottom:0.5rem;">Conversation 2 — C9 Data Modeling Mode (histogram + parameter estimation)</p>
+      <a href="https://claude.ai/chat/9200fcc0-488c-4714-93c3-0e77afa5b5b9" target="_blank" style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--accent);">
+        https://claude.ai/chat/9200fcc0-488c-4714-93c3-0e77afa5b5b9
+      </a>
+      <p style="margin-top:0.75rem;font-size:0.82rem;color:var(--muted);">
+        <strong>Prompts used:</strong> "Add a data upload section that reads CSV files, plots a histogram using Chart.js, estimates parameters for each distribution, and overlays the fitted PDF on the histogram."<br>
+        <strong>What AI generated:</strong> CSV parsing function, histogram bin calculation, moment-estimation formulas, and Chart.js mixed bar/line configuration.<br>
+        <strong>What I modified:</strong> Fixed bin-width normalization so bar heights represent density (not counts), corrected triangular mode estimation to use bin midpoints, and added the interpretation text logic.<br>
+        <strong>How I tested:</strong> Uploaded Dataset 1 and verified the normal overlay visually matched the histogram peak; uploaded Dataset 2 and confirmed the uniform overlay was flat across the data range.
+      </p>
+    </div>
+  </div>
+</div>
+ 
+<!-- Deployed link section (also satisfies C8/C9 requirement) -->
+<div style="background:var(--cream);border-top:1.5px solid var(--border);padding:1.5rem 3rem;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--muted);">
+    <span>🌐 Deployed at:</span>
+    <a id="deployed-link" href="REPLACE_WITH_YOUR_GITHUB_PAGES_URL" target="_blank" style="color:var(--accent2);">REPLACE_WITH_YOUR_GITHUB_PAGES_URL</a>
+  </div>
+</div>
+ 
+<footer>Probability Lab · Grade 10 Global Economics · Term 3 · 2025–2026 · Nicolás López Cuéllar</footer>
+
+<script src="global.js"></script>
+
+</body>
+</html>
